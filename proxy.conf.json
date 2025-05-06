@@ -1,0 +1,11 @@
+{
+    "/ztm-api": {
+      "target": "https://api.um.warszawa.pl",
+      "secure": false,
+      "changeOrigin": true,
+      "pathRewrite": {
+        "^/ztm-api": ""
+      }
+    }
+  }
+  

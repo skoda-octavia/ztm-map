@@ -1,2 +1,7 @@
 <google-map height="600px" width="800px" [options]="options">
+    @for (vehicle of vehicles; track vehicle) {
+        <map-advanced-marker
+          #markerElem="mapAdvancedMarker"
+          [position]="{ lat: vehicle.Lat, lng: vehicle.Lon }"
+        />}
 </google-map>
