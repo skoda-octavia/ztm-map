@@ -1,0 +1,17 @@
+.map-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 24px;
+    margin: 40px auto;
+    max-width: 1000px;
+  }
+  
+  .scroll-list {
+    width: 120px;
+    height: 600px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+  }
+  

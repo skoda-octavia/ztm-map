@@ -1,7 +1,21 @@
-<google-map height="600px" width="800px" [options]="options">
+<div class="map-row">
+  <google-map [height]="'600px'" [width]="'800px'" [options]="options">
     @for (vehicle of vehicles; track vehicle) {
-        <map-advanced-marker
-          #markerElem="mapAdvancedMarker"
-          [position]="{ lat: vehicle.Lat, lng: vehicle.Lon }"
-        />}
-</google-map>
+      <map-advanced-marker
+        #markerElem="mapAdvancedMarker"
+        [position]="{ lat: vehicle.Lat, lng: vehicle.Lon }"
+        [title]="'Linia: ' + vehicle.Lines + ', Brygada: ' + vehicle.Brigade + ', Ostatnia aktualizacja: ' + vehicle.Time"
+        (mapClick)="onMarkerClick(markerElem)"
+      />
+    }
+    <map-info-window #infoWindow></map-info-window>
+  </google-map>
+
+  <cdk-virtual-scroll-viewport class="scroll-list" itemSize="50">
+    @for (line of lines; track line) {
+      <button mat-button (click)="markLine(line)">
+        {{ line }}
+      </button>
+    }
+  </cdk-virtual-scroll-viewport>
+</div>
