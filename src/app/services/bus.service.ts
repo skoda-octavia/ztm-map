@@ -3,6 +3,7 @@ import { environment } from '../../environments/environments';
 import { Observable, map } from 'rxjs';
 import { Vehicle } from '../models/vehicle';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { VehicleEnum } from '../models/vehicle.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +12,10 @@ export class BusService {
 
   constructor(private http: HttpClient) { }
 
-  getVehicles() : Observable<Vehicle[]> {
+  getVehicles(type: VehicleEnum) : Observable<Vehicle[]> {
     const params = new HttpParams()
       .set('resource_id', environment.resourceId)
-      .set('type', "1")
+      .set('type', type)
       .set('apikey', environment.apiKey);
 
       return this.http.get<{ result: any[] }>(environment.vehicleApiAddr, {params}).pipe(

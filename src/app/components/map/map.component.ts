@@ -1,12 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { environment } from '../../../environments/environments';
 import { GoogleMapsModule, MapInfoWindow, MapAdvancedMarker } from "@angular/google-maps";
 import { BusService } from '../../services/bus.service';
 import { Vehicle } from '../../models/vehicle';
 import {ScrollingModule} from '@angular/cdk/scrolling';
 import {MatButtonModule} from '@angular/material/button';
-import { timer } from 'rxjs';
+import { timer, Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { SelectionService } from '../../services/selection.service';
+import { VehicleEnum } from '../../models/vehicle.enum';
 
 @Component({
   selector: 'app-map',
@@ -17,7 +19,7 @@ import { switchMap } from 'rxjs/operators';
 })
 
 
-export class MapComponent implements OnInit {
+export class MapComponent implements OnInit, OnDestroy{
   options: google.maps.MapOptions = {
     mapId: "DEMO_MAP_ID",
     center: environment.initCenter,
@@ -29,8 +31,12 @@ export class MapComponent implements OnInit {
   linesMap: Map<string, Vehicle[]> = new Map();
   lines: string[] = [];
   selectedLine: string | null = null;
+  subscription?: Subscription;
+  selectionSubscription?: Subscription;
+  selectedVehicle = VehicleEnum.Bus;
+  readonly REFRESH = 10000;
 
-  constructor(private busService: BusService) {}
+  constructor(private busService: BusService, private selectionService: SelectionService) {}
 
   
   sortBusses(vehicles: Vehicle[]): void {
@@ -47,6 +53,7 @@ export class MapComponent implements OnInit {
 
   markLine(line: string): void {
     this.selectedLine = line;
+    this.selectionService.changeLine(line);
     this.vehicles = this.linesMap.get(line) ?? [];
   }
 
@@ -56,23 +63,38 @@ export class MapComponent implements OnInit {
     this.lines = keys;
   }
 
-  ngOnInit(): void {
-    timer(0, 10000)
-      .pipe(switchMap(() => this.busService.getVehicles()))
+  setUpData(): void {
+    this.subscription?.unsubscribe();
+
+    this.subscription = timer(0, this.REFRESH)
+      .pipe(switchMap(() => this.busService.getVehicles(this.selectedVehicle)))
       .subscribe((vehicles) => {
         this.sortBusses(vehicles);
         this.setLinesList();
   
         if (this.selectedLine && this.linesMap.has(this.selectedLine)) {
-          this.vehicles = this.linesMap.get(this.selectedLine)!;
+          this.markLine(this.selectedLine);
         } else if (this.lines.length > 0) {
-          this.selectedLine = this.lines[0];
-          this.vehicles = this.linesMap.get(this.selectedLine)!;
+          this.markLine(this.lines[0]);
         } else {
           this.selectedLine = null;
           this.vehicles = [];
         }
       });
+
+  }
+
+  ngOnInit(): void {
+    this.setUpData();
+    this.selectionSubscription = this.selectionService.onVehicleTypeChange().subscribe(value => {
+      this.selectedVehicle = value;
+      this.setUpData();
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
+    this.selectionSubscription?.unsubscribe();
   }
 
   onMarkerClick(marker: MapAdvancedMarker) {

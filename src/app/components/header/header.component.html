@@ -1,18 +1,18 @@
 <mat-toolbar>
     <img src="bus.jpg" alt="image" class="logo-img">
-    <span>ZTM Tracker</span>
+    <span>ZTM Tracker: {{selectedTypeStr}} {{selectedLine}}</span>
     <span class="example-spacer"></span>
     <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
         <mat-icon>menu</mat-icon>
       </button>
-    <mat-menu #menu="matMenu">
-        <button mat-menu-item>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="handleSelection(VehicleEnum.Bus)">
           <mat-icon>directions_bus</mat-icon>
           <span>Track buses</span>
         </button>
-        <button mat-menu-item>
-            <mat-icon>tram</mat-icon>
-            <span>Track trams</span>
-          </button>
+        <button mat-menu-item (click)="handleSelection(VehicleEnum.Tram)">
+          <mat-icon>tram</mat-icon>
+          <span>Track trams</span>
+        </button>
       </mat-menu>
 </mat-toolbar>
